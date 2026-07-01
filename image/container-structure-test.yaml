@@ -32,6 +32,9 @@ fileExistenceTests:
   - name: workflow bundle is packaged
     path: /etc/career-steward/workflows/career-steward.yaml
     shouldExist: true
+  - name: skill bundle is packaged
+    path: /etc/career-steward/skills/career-opportunity-triage/SKILL.md
+    shouldExist: true
   - name: schema is packaged
     path: /etc/career-steward/schemas/agent.manifest.schema.json
     shouldExist: true
@@ -49,9 +52,16 @@ fileContentTests:
       - "name: career-steward-agent"
       - "displayName: Career Steward"
       - "repository: nousresearch/hermes-agent"
+      - "skills:"
+      - "career-opportunity-triage"
     excludedContents:
       - "Ree[v]e"
       - "selamy-labs.?hermes-agent"
+  - name: bundled skill describes ability source
+    path: /etc/career-steward/skills/approval-gated-correspondence/SKILL.md
+    expectedContents:
+      - "name: approval-gated-correspondence"
+      - "hard boundary between drafting and external action"
   - name: approval policy keeps side effects gated
     path: /etc/career-steward/policies/approval-gates.yaml
     expectedContents:
@@ -97,5 +107,6 @@ commandTests:
       - /opt/data/sim-run.json
     expectedOutput:
       - '"simMode": true'
+      - '"skillsLoaded":'
       - '"touchedRealAccounts": false'
       - '"externalSideEffects": \[\]'

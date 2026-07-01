@@ -33,7 +33,7 @@ capabilities:
   - id: managed-skills
     currentCapability: Skills bundle pin/init and external skills directory.
     evidence: values.yaml, config/config.yaml, templates/configmap-skills-pin.yaml
-    declarativeSurface: agent.manifest.yaml capabilities.toolsets and OCI image contents
+    declarativeSurface: agent.manifest.yaml skills refs and bundled skills/*/SKILL.md
     test: test_oci_contract_lists_bundled_skills
     testFile: test_manifest_contract.py
   - id: telegram-coordination

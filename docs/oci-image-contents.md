@@ -13,6 +13,7 @@ The v1 OCI image contains both the reference runtime payload and the reference r
 - reconciler
 - sim-mode runner
 - workflow manifests
+- bundled skill specs
 - policy manifests
 - schemas
 - default fake fixtures for sim mode

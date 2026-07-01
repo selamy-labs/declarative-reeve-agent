@@ -151,6 +151,86 @@ knowledge:
       - /opt/data/wiki
       - /opt/data/work
 
+skills:
+  bundle:
+    format: markdown-frontmatter
+    mountPath: /etc/career-steward/skills
+    loader: hermes-skill-loader
+    audiencePolicy: worker-only
+  refs:
+    - name: career-opportunity-triage
+      ref: skills/career-opportunity-triage/SKILL.md
+      audience: worker
+      provides:
+        - career-email-triage
+        - linkedin-inbox-triage
+        - opportunity-classification
+        - duplicate-notification-suppression
+        - calendar-state-reconciliation
+      requiredBy:
+        - workflows/career-steward.yaml
+    - name: approval-gated-correspondence
+      ref: skills/approval-gated-correspondence/SKILL.md
+      audience: worker
+      provides:
+        - approval-gated-reply-drafting
+        - draft-generation
+        - approval-gated-publication
+      requiredBy:
+        - workflows/career-steward.yaml
+        - workflows/content-inbound.yaml
+    - name: interview-prep-packet
+      ref: skills/interview-prep-packet/SKILL.md
+      audience: worker
+      provides:
+        - interview-prep-doc-generation
+        - transcript-debrief-ingestion
+        - resume-variant-checklist
+        - target-packet-rendering
+      requiredBy:
+        - workflows/career-steward.yaml
+    - name: pipeline-state-stewardship
+      ref: skills/pipeline-state-stewardship/SKILL.md
+      audience: worker
+      provides:
+        - throughput-ledger-updates
+        - private-knowledge-entry-write
+      requiredBy:
+        - workflows/career-steward.yaml
+        - workflows/whatsapp-intake.yaml
+    - name: content-safety-redaction
+      ref: skills/content-safety-redaction/SKILL.md
+      audience: worker
+      provides:
+        - article-fodder-backlog
+        - public-safety-scrub
+        - content-seed-queueing
+        - inbound-source-attribution
+      requiredBy:
+        - workflows/content-inbound.yaml
+        - workflows/whatsapp-intake.yaml
+    - name: private-message-digest
+      ref: skills/private-message-digest/SKILL.md
+      audience: worker
+      provides:
+        - group-message-read
+        - signal-classification
+        - paraphrased-digest-generation
+      requiredBy:
+        - workflows/whatsapp-intake.yaml
+    - name: state-maintenance
+      ref: skills/state-maintenance/SKILL.md
+      audience: worker
+      provides:
+        - state-retention
+        - sqlite-cleanup
+        - pvc-cache-pruning
+        - video-cache-pruning
+        - log-pruning
+        - restart-safe-maintenance
+      requiredBy:
+        - workflows/state-maintenance.yaml
+
 workflows:
   - ref: workflows/career-steward.yaml
   - ref: workflows/whatsapp-intake.yaml

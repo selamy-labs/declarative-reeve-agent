@@ -13,6 +13,7 @@
     "runtime",
     "capabilities",
     "knowledge",
+    "skills",
     "workflows",
     "policies",
     "schedules",
@@ -110,6 +111,25 @@
       }
     },
     "knowledge": { "type": "object", "required": ["wiki", "memory", "careerGraph", "generatedArtifacts"] },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bundle", "refs"],
+      "properties": {
+        "bundle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["format", "mountPath", "loader", "audiencePolicy"],
+          "properties": {
+            "format": { "const": "markdown-frontmatter" },
+            "mountPath": { "type": "string", "pattern": "^/" },
+            "loader": { "type": "string" },
+            "audiencePolicy": { "enum": ["worker-only", "universal-only"] }
+          }
+        },
+        "refs": { "type": "array", "items": { "$ref": "#/$defs/skillRef" }, "minItems": 1 }
+      }
+    },
     "workflows": { "type": "array", "items": { "$ref": "#/$defs/ref" }, "minItems": 1 },
     "policies": { "type": "object", "required": ["approvalGates", "privacy", "writeBoundary"] },
     "schedules": { "type": "object", "additionalProperties": { "$ref": "#/$defs/schedule" } },
@@ -171,6 +191,18 @@
       "required": ["ref"],
       "properties": {
         "ref": { "type": "string", "pattern": "^workflows/[a-z0-9-]+\\.yaml$" }
+      }
+    },
+    "skillRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "ref", "audience", "provides", "requiredBy"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$" },
+        "ref": { "type": "string", "pattern": "^skills/[a-z0-9-]+/SKILL\\.md$" },
+        "audience": { "enum": ["worker", "universal"] },
+        "provides": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "requiredBy": { "type": "array", "items": { "type": "string", "pattern": "^workflows/[a-z0-9-]+\\.yaml$" }, "minItems": 1 }
       }
     },
     "schedule": {

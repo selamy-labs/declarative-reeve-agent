@@ -20,6 +20,9 @@ The reconciler validates:
 
 - manifest schema and versioning
 - workflow references exist
+- skill references exist
+- bundled skill frontmatter matches manifest refs
+- workflow capabilities are covered by declared skill `provides` entries
 - schedules reference known workflows
 - connector secret references are declared
 - secret contracts contain remote key, injection target, and verification
@@ -37,5 +40,4 @@ If live state differs from generated artifacts, the downstream repo must either 
 
 ## Failure Mode
 
-The reconciler fails closed. Missing secrets, missing approval gates, unknown workflow references, and unfinished docs block verification before artifact publication.
-
+The reconciler fails closed. Missing secrets, missing skills, missing approval gates, unknown workflow references, and unfinished docs block verification before artifact publication.

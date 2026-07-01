@@ -6,9 +6,10 @@ Define a buildable v1 specification and reference implementation for a career-st
 
 ## Canonical Inputs
 
-- `agent.manifest.yaml`: single source of truth for identity, runtime, capabilities, knowledge, workflows, schedules, feature flags, observability, and validation.
+- `agent.manifest.yaml`: single source of truth for identity, runtime, capabilities, skills, knowledge, workflows, schedules, feature flags, observability, and validation.
 - `contracts/required-secrets.yaml`: required secret references, scopes, injection paths, manual prerequisites, and verification checks.
 - `policies/approval-gates.yaml`: non-removable approval and forbidden-action rules.
+- `skills/*/SKILL.md`: bundled worker-readable methods for career-steward judgment and procedure.
 - `workflows/*.yaml`: declarative workflow surfaces and state models.
 - `schemas/agent.manifest.schema.json`: v1alpha1 schema and versioning contract.
 
@@ -32,9 +33,10 @@ The v1 reference image contains:
 - canonical `nousresearch/hermes-agent` runtime base
 - manifest validator
 - reconciler
+- bundled skills
 - workflow and policy manifests
 - sim-mode career-steward loop
-- conformance tests
+- conformance test runner
 - schema files
 
 The image does not contain real credentials, source-operator private tracker data, OAuth tokens, or deployment ownership.
@@ -52,6 +54,17 @@ The career-steward loop is:
 7. emit observability and audit records
 
 The v1 sim mode must execute that loop using fake data only.
+
+## Ability Contract
+
+The agent derives abilities from declarations in layers:
+
+- Manifest skill refs declare which bundled skills may be loaded.
+- Skill files describe career-steward methods the worker reads into context.
+- Workflow manifests bind skill-provided capabilities to recurring jobs and state models.
+- Connectors and tools provide callable external capability behind secret references and policy gates.
+
+Skills must not contain credential values or imperative setup. Any API call that needs credentials belongs in a connector/tool contract, not in prose hidden inside a skill.
 
 ## Compatibility
 

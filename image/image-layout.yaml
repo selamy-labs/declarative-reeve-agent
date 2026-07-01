@@ -35,6 +35,8 @@ copies:
     target: /etc/career-steward/contracts
   - source: policies
     target: /etc/career-steward/policies
+  - source: skills
+    target: /etc/career-steward/skills
   - source: workflows
     target: /etc/career-steward/workflows
   - source: schemas

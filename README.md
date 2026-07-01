@@ -4,7 +4,7 @@ Declarative specification and reference implementation for approval-gated career
 
 ## What & Why
 
-This repository defines a reusable career-steward agent from source declarations: identity, runtime, connectors, workflows, schedules, secrets, policy, state, observability, and tests. Operators bring their own credentials by reference; no private source-operator data or hidden setup belongs in the repo.
+This repository defines a reusable career-steward agent from source declarations: identity, runtime, bundled skills, connectors, workflows, schedules, secrets, policy, state, observability, and tests. Operators bring their own credentials by reference; no private source-operator data or hidden setup belongs in the repo.
 
 The repo is a specification and build source, not a live deployment. CI proves the spec, sim mode, and generated artifacts; downstream infrastructure decides whether to run the produced OCI image and Helm chart.
 
@@ -53,19 +53,39 @@ intake -> classify -> draft -> approval gate -> pipeline update -> privacy valid
 ## Architecture
 
 ```mermaid
-flowchart LR
-  manifest["agent.manifest.yaml"] --> reconciler["reference reconciler"]
-  contracts["contracts + policies + workflows"] --> reconciler
-  reconciler --> generated["generated runtime, Helm, secrets, schedules"]
-  generated --> artifacts["OCI image + Helm chart"]
-  artifacts --> downstream["downstream infra repo"]
+flowchart TB
+  principal["Principal"]
+  operator["Operator"]
+  manifest["agent.manifest.yaml"]
+  runtime["Career Steward Agent\nHermes runtime"]
+  skills["Bundled skills\ncareer judgment + methods"]
+  workflows["Workflows\nwhen to apply skills"]
+  policy["Approval + privacy policy"]
+  state["Private state\nmemory, wiki, audit"]
+  connectors["Declared connectors\nGoogle, Telegram, LinkedIn, WhatsApp, GitHub"]
+  infra["Downstream infra\nKubernetes, Helm, secrets"]
+
+  operator --> manifest
+  manifest --> runtime
+  manifest --> skills
+  manifest --> workflows
+  infra --> runtime
+  principal <--> runtime
+  runtime --> workflows
+  workflows --> skills
+  runtime --> policy
+  policy --> connectors
+  runtime <--> state
 ```
 
-The runtime is Hermes-compatible and uses the canonical `nousresearch/hermes-agent` base image. Published runtime artifacts are consumed by digest.
+The repo defines the agent contract and reference image; a downstream infra repo decides whether to run it. At runtime, the agent acts for a principal, loads bundled skills for career-steward judgment, uses declared connectors for credentialed calls, writes declared private state, and gates outbound or state-mutating actions through approval and privacy policy.
+
+See `docs/architecture.md` for context and container views.
 
 ## Configuration
 
 - Manifest schema: `schemas/agent.manifest.schema.json`
+- Architecture: `docs/architecture.md`
 - Reconciler contract: `docs/reconciler-contract.md`
 - Policy engine: `docs/policy-engine-spec.md`
 - Observability: `docs/observability-contract.md`

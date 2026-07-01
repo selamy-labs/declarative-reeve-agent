@@ -63,6 +63,7 @@ def run_sim(manifest_path: Path, input_path: Path) -> dict[str, Any]:
     return {
         "simMode": True,
         "agent": manifest["metadata"]["name"],
+        "skillsLoaded": [item["name"] for item in manifest.get("skills", {}).get("refs", [])],
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "steps": [
             {"name": "intake", "status": "ok", "source": inbound["source"]},
@@ -95,4 +96,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

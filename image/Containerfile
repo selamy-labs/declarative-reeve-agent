@@ -14,6 +14,7 @@ ENV PYTHONPATH="/opt/career-steward-agent/src"
 COPY agent.manifest.yaml /etc/career-steward/agent.manifest.yaml
 COPY contracts /etc/career-steward/contracts
 COPY policies /etc/career-steward/policies
+COPY skills /etc/career-steward/skills
 COPY workflows /etc/career-steward/workflows
 COPY schemas /etc/career-steward/schemas
 COPY docs /opt/career-steward-agent/docs

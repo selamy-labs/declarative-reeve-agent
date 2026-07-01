@@ -18,6 +18,7 @@ class SimModeTest(unittest.TestCase):
         self.assertTrue(self.result["simMode"])
         self.assertFalse(self.result["touchedRealAccounts"])
         self.assertEqual(self.result["externalSideEffects"], [])
+        self.assertIn("career-opportunity-triage", self.result["skillsLoaded"])
         self.assertEqual([step["name"] for step in self.result["steps"]], [
             "intake",
             "classify",
@@ -37,4 +38,3 @@ class SimModeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

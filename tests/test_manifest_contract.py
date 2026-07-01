@@ -47,8 +47,17 @@ class ManifestContractTest(unittest.TestCase):
         image = json.loads(rendered["image_manifest"].read_text())
         self.assertEqual(image["runtimeBaseImage"], "nousresearch/hermes-agent:main")
         self.assertEqual(image["tagPolicy"], "pinned-digest")
-        self.assertIn("skill bundle references", image["contains"])
+        self.assertIn("bundled skill specs", image["contains"])
         self.assertIn("real user credentials", image["doesNotContain"])
+
+    def test_skill_bundle_declares_ability_sources(self) -> None:
+        skills = self.manifest["skills"]["refs"]
+        names = {item["name"] for item in skills}
+        provides = {capability for item in skills for capability in item["provides"]}
+        self.assertIn("career-opportunity-triage", names)
+        self.assertIn("approval-gated-correspondence", names)
+        self.assertIn("career-email-triage", provides)
+        self.assertIn("approval-gated-reply-drafting", provides)
 
     def test_telegram_connector_declared(self) -> None:
         telegram = self.manifest["capabilities"]["connectors"]["telegram"]
