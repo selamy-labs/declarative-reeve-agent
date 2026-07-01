@@ -1,0 +1,56 @@
+apiVersion: agents.selamy.dev/v1alpha1
+kind: ReferenceImageLayout
+metadata:
+  name: career-steward-agent
+  description: Reference image layout for the career steward agent runtime artifact.
+
+baseImage:
+  repository: nousresearch/hermes-agent
+  tag: main
+  tagPolicy: pinned-digest
+
+workdir: /opt/career-steward-agent
+entrypoint: [python3, -m, career_steward.sim]
+cmd:
+  - --manifest
+  - /etc/career-steward/agent.manifest.yaml
+  - --input
+  - /opt/career-steward-agent/examples/sim/inbound-message.json
+  - --out
+  - /opt/data/sim-run.json
+
+env:
+  PYTHONPATH: /opt/career-steward-agent/src
+
+labels:
+  org.opencontainers.image.title: Career Steward Agent
+  org.opencontainers.image.description: Declarative career-steward agent reference implementation.
+  dev.selamy.base-image: nousresearch/hermes-agent:main
+  dev.selamy.agent.manifest: /etc/career-steward/agent.manifest.yaml
+
+copies:
+  - source: agent.manifest.yaml
+    target: /etc/career-steward/agent.manifest.yaml
+  - source: contracts
+    target: /etc/career-steward/contracts
+  - source: policies
+    target: /etc/career-steward/policies
+  - source: workflows
+    target: /etc/career-steward/workflows
+  - source: schemas
+    target: /etc/career-steward/schemas
+  - source: docs
+    target: /opt/career-steward-agent/docs
+  - source: src/career_steward
+    target: /opt/career-steward-agent/src/career_steward
+  - source: scripts
+    target: /opt/career-steward-agent/scripts
+  - source: examples
+    target: /opt/career-steward-agent/examples
+
+forbiddenPaths:
+  - /etc/hermes/codex-auth/credentials.json
+  - /opt/data/google_token_fixed.json
+  - /opt/data/wiki
+  - /opt/data/work
+  - /root/.ssh

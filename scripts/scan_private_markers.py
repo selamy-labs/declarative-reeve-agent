@@ -19,6 +19,10 @@ MARKERS = [
     "TO" + "DO",
     "TB" + "D",
     "FIX" + "ME",
+    "Ree" + "ve",
+    "ree" + "ve",
+    "declarative-" + "ree" + "ve-agent",
+    "selamy-labs/" + "hermes-agent",
 ]
 
 

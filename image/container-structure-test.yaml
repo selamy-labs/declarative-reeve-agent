@@ -1,0 +1,101 @@
+schemaVersion: "2.0.0"
+
+metadataTest:
+  baseImage: nousresearch/hermes-agent:main
+  workdir: /opt/career-steward-agent
+  entrypoint: [python3, -m, career_steward.sim]
+  cmd:
+    - --manifest
+    - /etc/career-steward/agent.manifest.yaml
+    - --input
+    - /opt/career-steward-agent/examples/sim/inbound-message.json
+    - --out
+    - /opt/data/sim-run.json
+  env:
+    - key: PYTHONPATH
+      value: /opt/career-steward-agent/src
+  labels:
+    - key: org.opencontainers.image.title
+      value: Career Steward Agent
+    - key: dev.selamy.base-image
+      value: nousresearch/hermes-agent:main
+    - key: dev.selamy.agent.manifest
+      value: /etc/career-steward/agent.manifest.yaml
+
+fileExistenceTests:
+  - name: agent manifest is packaged
+    path: /etc/career-steward/agent.manifest.yaml
+    shouldExist: true
+  - name: approval policy is packaged
+    path: /etc/career-steward/policies/approval-gates.yaml
+    shouldExist: true
+  - name: workflow bundle is packaged
+    path: /etc/career-steward/workflows/career-steward.yaml
+    shouldExist: true
+  - name: schema is packaged
+    path: /etc/career-steward/schemas/agent.manifest.schema.json
+    shouldExist: true
+  - name: reference runtime package is packaged
+    path: /opt/career-steward-agent/src/career_steward/sim.py
+    shouldExist: true
+  - name: sim fixture is packaged
+    path: /opt/career-steward-agent/examples/sim/inbound-message.json
+    shouldExist: true
+
+fileContentTests:
+  - name: manifest has generic identity and canonical base
+    path: /etc/career-steward/agent.manifest.yaml
+    expectedContents:
+      - "name: career-steward-agent"
+      - "displayName: Career Steward"
+      - "repository: nousresearch/hermes-agent"
+    excludedContents:
+      - "Ree[v]e"
+      - "selamy-labs.?hermes-agent"
+  - name: approval policy keeps side effects gated
+    path: /etc/career-steward/policies/approval-gates.yaml
+    expectedContents:
+      - "default: deny-external-side-effects"
+      - "send.email"
+      - "send.whatsapp-message"
+      - "commit.secret-value"
+  - name: image docs state exclusions
+    path: /opt/career-steward-agent/docs/oci-image-contents.md
+    expectedContents:
+      - "real credentials"
+      - "real OAuth tokens"
+      - "environment-specific deployment decisions"
+
+forbiddenPathTests:
+  - name: no mounted Google user token
+    path: /opt/data/google_token_fixed.json
+  - name: no Codex auth material
+    path: /etc/hermes/codex-auth/credentials.json
+  - name: no SSH keys
+    path: /root/.ssh
+  - name: no private wiki state
+    path: /opt/data/wiki
+
+commandTests:
+  - name: packaged Python module imports
+    command: python3
+    args:
+      - -c
+      - "import career_steward; print(','.join(career_steward.__all__))"
+    expectedOutput:
+      - "policy,reconciler,sim,validator"
+  - name: packaged sim loop runs without real accounts
+    command: python3
+    args:
+      - -m
+      - career_steward.sim
+      - --manifest
+      - /etc/career-steward/agent.manifest.yaml
+      - --input
+      - /opt/career-steward-agent/examples/sim/inbound-message.json
+      - --out
+      - /opt/data/sim-run.json
+    expectedOutput:
+      - '"simMode": true'
+      - '"touchedRealAccounts": false'
+      - '"externalSideEffects": \[\]'

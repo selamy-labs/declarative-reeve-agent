@@ -21,7 +21,8 @@ Expected result:
 
 ```text
 validation.status: ok
-16 tests run
+container structure tests ok
+unit tests pass
 touchedRealAccounts: false
 externalSideEffects: []
 ```
@@ -76,11 +77,12 @@ The runtime is Hermes-compatible and uses the canonical `nousresearch/hermes-age
 
 ```bash
 make test
+make container-structure
 make verify
 python3 scripts/scan_private_markers.py
 ```
 
-`make verify` runs schema/contract validation, policy tests, write-boundary tests, and a no-real-accounts sim smoke test.
+`make verify` runs schema/contract validation, container structure tests, policy tests, write-boundary tests, and a no-real-accounts sim smoke test. `make image-structure` applies the same structure spec to a Docker-built reference image when Docker and the canonical Hermes base image are available.
 
 ## Contributing
 
