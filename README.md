@@ -79,10 +79,13 @@ The runtime is Hermes-compatible and uses the canonical `nousresearch/hermes-age
 make test
 make container-structure
 make verify
+make image-structure
 python3 scripts/scan_private_markers.py
 ```
 
-`make verify` runs schema/contract validation, container structure tests, policy tests, write-boundary tests, and a no-real-accounts sim smoke test. `make image-structure` applies the same structure spec to a Docker-built reference image when Docker and the canonical Hermes base image are available.
+`make verify` runs schema/contract validation, container structure tests, policy tests, write-boundary tests, and a no-real-accounts sim smoke test.
+
+`make image-structure` builds `image/Containerfile` and applies the same structure spec to the real image. It uses a Docker-compatible runtime by default; on macOS, Colima provides an open-source-friendly local runtime. Use `CONTAINER_RUNTIME=podman make image-structure` when Podman is available.
 
 ## Contributing
 

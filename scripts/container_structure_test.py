@@ -72,11 +72,11 @@ def parse_env_list(env: list[str] | None) -> dict[str, str]:
     return parsed
 
 
-def docker_rootfs(image: str, docker: str) -> tuple[tempfile.TemporaryDirectory[str], Path, dict[str, Any]]:
-    if not shutil.which(docker):
-        raise SystemExit(f"{docker} is required for --image mode")
+def runtime_rootfs(image: str, runtime: str) -> tuple[tempfile.TemporaryDirectory[str], Path, dict[str, Any]]:
+    if not shutil.which(runtime):
+        raise SystemExit(f"{runtime} is required for --image mode")
     inspect = subprocess.run(
-        [docker, "image", "inspect", image],
+        [runtime, "image", "inspect", image],
         check=True,
         text=True,
         stdout=subprocess.PIPE,
@@ -97,15 +97,15 @@ def docker_rootfs(image: str, docker: str) -> tuple[tempfile.TemporaryDirectory[
     tmp = tempfile.TemporaryDirectory()
     rootfs = (Path(tmp.name) / "rootfs").resolve()
     rootfs.mkdir()
-    container = subprocess.check_output([docker, "create", image], text=True).strip()
+    container = subprocess.check_output([runtime, "create", image], text=True).strip()
     try:
         archive = Path(tmp.name) / "rootfs.tar"
         with archive.open("wb") as handle:
-            subprocess.run([docker, "export", container], check=True, stdout=handle)
+            subprocess.run([runtime, "export", container], check=True, stdout=handle)
         with tarfile.open(archive) as tar:
             safe_extract(tar, rootfs)
     finally:
-        subprocess.run([docker, "rm", "-f", container], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run([runtime, "rm", "-f", container], check=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     return tmp, rootfs, metadata
 
 
@@ -209,8 +209,8 @@ def run_layout_command_test(
     return check_command_result(item, result.returncode, result.stdout + result.stderr, failures)
 
 
-def run_image_command_test(item: dict[str, Any], image: str, docker: str, failures: list[str]) -> int:
-    command = [docker, "run", "--rm", "--entrypoint", item["command"], image, *[str(arg) for arg in item.get("args", [])]]
+def run_image_command_test(item: dict[str, Any], image: str, runtime: str, failures: list[str]) -> int:
+    command = [runtime, "run", "--rm", "--entrypoint", item["command"], image, *[str(arg) for arg in item.get("args", [])]]
     result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     return check_command_result(item, result.returncode, result.stdout + result.stderr, failures)
 
@@ -231,12 +231,12 @@ def run_command_tests(
     config: dict[str, Any],
     failures: list[str],
     image: str | None,
-    docker: str,
+    runtime: str,
 ) -> int:
     checks = 0
     for item in spec.get("commandTests", []):
         if image:
-            checks += run_image_command_test(item, image, docker, failures)
+            checks += run_image_command_test(item, image, runtime, failures)
         else:
             checks += run_layout_command_test(item, rootfs, config, failures)
     return checks
@@ -248,13 +248,14 @@ def main() -> int:
     source.add_argument("--layout", default=str(DEFAULT_LAYOUT))
     source.add_argument("--image")
     parser.add_argument("--spec", default=str(DEFAULT_SPEC))
-    parser.add_argument("--docker", default="docker")
+    parser.add_argument("--runtime", default="docker")
+    parser.add_argument("--docker", dest="runtime", default=argparse.SUPPRESS)
     args = parser.parse_args()
 
     spec = load_yaml(Path(args.spec))
     tmp: tempfile.TemporaryDirectory[str] | None = None
     if args.image:
-        tmp, rootfs, config = docker_rootfs(args.image, args.docker)
+        tmp, rootfs, config = runtime_rootfs(args.image, args.runtime)
     else:
         _, rootfs, config = load_layout(Path(args.layout))
 
@@ -263,7 +264,7 @@ def main() -> int:
     try:
         checks += run_metadata_tests(spec, config, failures)
         checks += run_file_tests(spec, rootfs, failures)
-        checks += run_command_tests(spec, rootfs, config, failures, args.image, args.docker)
+        checks += run_command_tests(spec, rootfs, config, failures, args.image, args.runtime)
     finally:
         if tmp:
             tmp.cleanup()

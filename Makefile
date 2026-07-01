@@ -2,6 +2,7 @@
 
 PYTHON ?= python3
 IMAGE_TAG ?= career-steward-agent:structure-test
+CONTAINER_RUNTIME ?= docker
 export PYTHONPATH := src
 
 verify:
@@ -23,5 +24,5 @@ container-structure: image-layout
 	$(PYTHON) scripts/container_structure_test.py --layout generated/image-layout --spec image/container-structure-test.yaml
 
 image-structure:
-	docker build -f image/Containerfile -t $(IMAGE_TAG) .
-	$(PYTHON) scripts/container_structure_test.py --image $(IMAGE_TAG) --spec image/container-structure-test.yaml
+	$(CONTAINER_RUNTIME) build -f image/Containerfile -t $(IMAGE_TAG) .
+	$(PYTHON) scripts/container_structure_test.py --image $(IMAGE_TAG) --spec image/container-structure-test.yaml --runtime $(CONTAINER_RUNTIME)

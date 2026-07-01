@@ -36,4 +36,4 @@ Consumers pin published images by digest. The Helm chart mounts or embeds the se
 
 `make container-structure` builds the reference image layout under `generated/image-layout` and runs `image/container-structure-test.yaml` against its rootfs and image metadata. The tests prove required files, metadata, policy/config content, command wiring, and forbidden paths before artifact publication.
 
-`make image-structure` applies the same structure spec to an actual Docker-built image from `image/Containerfile` when Docker and the canonical Hermes base image are available.
+`make image-structure` applies the same structure spec to an actual image built from `image/Containerfile`. The target uses `CONTAINER_RUNTIME`, defaulting to the Docker-compatible CLI; on macOS, Colima is the recommended open-source-friendly local runtime. Podman is supported with `CONTAINER_RUNTIME=podman` when its VM provider is available.

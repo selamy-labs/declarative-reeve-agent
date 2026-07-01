@@ -60,10 +60,13 @@ Preferred shape:
 //agent:manifest_validate
 //agent:image
 //agent:helm_chart
+//agent:image_structure_test
 //agent:conformance_tests
 ```
 
 CI runs those targets. Release automation publishes the image and chart.
+
+If this repository adopts Bazel, image construction should use `rules_oci` or an equivalent OCI-native rule set. The current `make image-structure` target is the v1 non-Bazel equivalent of an image-build plus image-structure-test target; it should become part of the Bazel graph rather than remaining an external shell-only check.
 
 ## CI/CD Boundary
 
