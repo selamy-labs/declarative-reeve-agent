@@ -24,5 +24,8 @@ jobs:
       - name: Verify career steward agent spec
         run: make verify
 
+      - name: Verify reference image structure
+        run: make image-structure
+
       - name: Scan for private markers
         run: python scripts/scan_private_markers.py
