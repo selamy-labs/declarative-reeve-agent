@@ -2,6 +2,10 @@
 
 This document describes the reusable career-steward agent system, not just the build process. The repository is the source specification. The produced image and Helm chart are delivery artifacts that a downstream infrastructure repo may choose to run.
 
+The diagram-freshness baseline is the minimal
+[`System Context`](architecture/system-context.md) under `docs/architecture/`.
+This document adds the detailed container and behavioral views.
+
 ## What We Built
 
 - A declarative agent contract centered on `agent.manifest.yaml`.
